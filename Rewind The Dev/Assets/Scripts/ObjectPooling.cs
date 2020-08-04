@@ -12,12 +12,12 @@ public class ObjectPooling : MonoBehaviour
         public int size;
     }
 
-    public static ObjectPooling instance;
-    private void Awake() => instance = this;
+    //public static ObjectPooling instance;
+    //private void Awake() => instance = this;
     
 
     public Pool[] pools;
-    public Dictionary<string, Queue<GameObject>> poolDictionary;
+    public Dictionary<string, Queue<GameObject>> poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
 
     void Start()
@@ -29,10 +29,10 @@ public class ObjectPooling : MonoBehaviour
             {
                 GameObject aux = Instantiate(pools[i].prefab);
                 aux.SetActive(false);
-                pool.Enqueue(aux);
+                pool.Enqueue(aux);               
             }
             poolDictionary.Add(pools[i].key, pool);
-        }
+        }       
     }
 
     public GameObject SpawnFromPool(string pool,Vector3 pos,Quaternion rot)
