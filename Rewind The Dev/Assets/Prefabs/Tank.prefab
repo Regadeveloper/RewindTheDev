@@ -126,4 +126,6 @@ MonoBehaviour:
   damage: 10
   life: 50
   attackRange: 2
+  attackCD: 4
   type: 3
+  attackCount: 4

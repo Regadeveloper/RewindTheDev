@@ -3,16 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
 public class UnitBehaviour : MonoBehaviour
 {
-    public enum UnitType
-    {
-        SOLDIER =0,
-        ARCHER,
-        PLANE,
-        TANK
-    }
-
     enum UnitState
     {
         MOVE_FORWARD = 0,
@@ -20,15 +13,17 @@ public class UnitBehaviour : MonoBehaviour
         DIE 
     }
 
-    [SerializeField] bool playerUnit;
+    public bool playerUnit;
     [SerializeField] float moveSpeed;
     [SerializeField] int damage;
     [SerializeField] float life;
     [SerializeField] float attackRange;
+    [SerializeField] float attackCD;
     public UnitType type;
 
-    GameObject atkObj;
+    Vector3 atkPos;
     UnitState currentState;
+    [SerializeField]float attackCount;
 
     void Start()
     {
@@ -39,6 +34,7 @@ public class UnitBehaviour : MonoBehaviour
     public void OnEnable()
     {
         currentState = UnitState.MOVE_FORWARD;
+        attackCount = 0;
         if (playerUnit)
         {
             transform.Rotate(0,180,0);
@@ -63,6 +59,8 @@ public class UnitBehaviour : MonoBehaviour
                     RaycastHit2D hitGround;
                     RaycastHit2D hitAir;
                     Vector3 airPos = transform.position;
+                    if (attackCount < attackCD) attackCount += Time.deltaTime;
+
                     switch (type)
                     {
                         case UnitType.SOLDIER:
@@ -71,13 +69,13 @@ public class UnitBehaviour : MonoBehaviour
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitGround.collider.gameObject;
-                                Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                atkPos = hitGround.point;
+                                //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
                             }
                             break;
                         case UnitType.PLANE:
@@ -91,29 +89,29 @@ public class UnitBehaviour : MonoBehaviour
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkObj = hitAir.collider.gameObject;
-                                    else atkObj = hitGround.collider.gameObject;
+                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
+                                    else atkPos = hitGround.point;
 
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                                 }
                                 else
                                 {
-                                    atkObj = hitGround.collider.gameObject;
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    atkPos = hitGround.point;
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                                 }
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitAir.collider.gameObject;
-                                Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                atkPos = hitAir.point;
+                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
                             }
                             break;
                         case UnitType.ARCHER:
@@ -128,29 +126,29 @@ public class UnitBehaviour : MonoBehaviour
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkObj = hitAir.collider.gameObject;
-                                    else atkObj = hitGround.collider.gameObject;
+                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
+                                    else atkPos = hitGround.point;
 
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    Debug.DrawRay(airPos, -transform.right * hitAir.distance, Color.red);
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    //Debug.DrawRay(airPos, -transform.right * hitAir.distance, Color.red);
                                 }
                                 else 
                                 {
-                                    atkObj = hitGround.collider.gameObject;
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    atkPos = hitGround.point;
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                                 }                                                                                                                            
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitAir.collider.gameObject;
-                                Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                atkPos = hitAir.point;
+                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
                             }                          
                             break;
                     }                                  
@@ -164,8 +162,19 @@ public class UnitBehaviour : MonoBehaviour
                         transform.position += move;
                         break;
                     case UnitState.ATTACK:
+                        if (attackCount >= attackCD)
+                        {
+                            GameObject bullet = ObjectPooling.instance.SpawnFromPool("Bullets", transform.position, Quaternion.identity);
+                            if (bullet != null)
+                            {
+                                bullet.GetComponent<Bullet>().SetBullet(atkPos, damage);
+                                bullet.tag = "PlayerBullet";
+                            }
+                            attackCount = 0;
+                        }
                         break;
                     case UnitState.DIE:
+                        gameObject.SetActive(false);
                         break;
                 }
             }
@@ -178,6 +187,8 @@ public class UnitBehaviour : MonoBehaviour
                     RaycastHit2D hitGround;
                     RaycastHit2D hitAir;
                     Vector3 airPos = transform.position;
+                    if (attackCount < attackCD) attackCount += Time.deltaTime;
+
                     switch (type)
                     {
                         case UnitType.SOLDIER:
@@ -186,13 +197,13 @@ public class UnitBehaviour : MonoBehaviour
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitGround.collider.gameObject;
-                                Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                atkPos = hitGround.point;
+                                //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
                             }
                             break;
                         case UnitType.PLANE:
@@ -206,29 +217,29 @@ public class UnitBehaviour : MonoBehaviour
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkObj = hitAir.collider.gameObject;
-                                    else atkObj = hitGround.collider.gameObject;
+                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
+                                    else atkPos = hitGround.point;
 
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                                 }
                                 else
                                 {
-                                    atkObj = hitGround.collider.gameObject;
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    atkPos = hitGround.point;
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                                 }
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitAir.collider.gameObject;
-                                Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                atkPos = hitAir.point;
+                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
                             }
                             break;
                         case UnitType.ARCHER:
@@ -243,29 +254,29 @@ public class UnitBehaviour : MonoBehaviour
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkObj = hitAir.collider.gameObject;
-                                    else atkObj = hitGround.collider.gameObject;
+                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
+                                    else atkPos = hitGround.point;
 
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                                 }
                                 else
                                 {
-                                    atkObj = hitGround.collider.gameObject;
-                                    Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    atkPos = hitGround.point;
+                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                                 }
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
-                                atkObj = hitAir.collider.gameObject;
-                                Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                atkPos = hitAir.point;
+                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
                             else
                             {
                                 currentState = UnitState.MOVE_FORWARD;
-                                Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
+                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
                             }
                             break;
                     }
@@ -279,10 +290,42 @@ public class UnitBehaviour : MonoBehaviour
                         transform.position += move;
                         break;
                     case UnitState.ATTACK:
+                        if (attackCount >= attackCD)
+                        {
+                            GameObject bullet = ObjectPooling.instance.SpawnFromPool("Bullets", transform.position, Quaternion.identity);
+                            if (bullet != null)
+                            {
+                                bullet.GetComponent<Bullet>().SetBullet(atkPos, damage);
+                                bullet.tag = "EnemyBullet";
+                            }
+                            attackCount = 0;
+                        }
                         break;
                     case UnitState.DIE:
+                        gameObject.SetActive(false);
                         break;
                 }
+            }
+        }
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (playerUnit)
+        {
+            if (collision.gameObject.CompareTag("EnemyBullet"))
+            {
+                life -= collision.gameObject.GetComponent<Bullet>().GetDamage();
+                collision.gameObject.SetActive(false);
+                
+            }
+        }
+        else 
+        {
+            if (collision.gameObject.CompareTag("PlayerBullet"))
+            {
+                life -= collision.gameObject.GetComponent<Bullet>().GetDamage();
+                collision.gameObject.SetActive(false);
             }
         }
     }

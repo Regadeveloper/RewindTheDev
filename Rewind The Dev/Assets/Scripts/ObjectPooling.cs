@@ -12,8 +12,8 @@ public class ObjectPooling : MonoBehaviour
         public int size;
     }
 
-    //public static ObjectPooling instance;
-    //private void Awake() => instance = this;
+    public static ObjectPooling instance;
+    private void Awake() => instance = this;
     
 
     public Pool[] pools;
