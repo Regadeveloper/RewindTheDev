@@ -351,8 +351,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ad4bffaf2b296946ab80019cefbc2ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Pos1: {x: -20, y: 0}
-  Pos2: {x: -35, y: 0}
+  Pos1: {x: -35, y: 0}
+  Pos2: {x: -55, y: 0}
   Pos3: {x: 0, y: 0}
   Pos4: {x: 0, y: 0}
   Pos5: {x: 0, y: 0}
