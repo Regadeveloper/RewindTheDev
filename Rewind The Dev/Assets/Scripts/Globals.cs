@@ -17,4 +17,5 @@ public static class Globals
     public static int archerCost = 3;
     public static int planeCost = 10;
     public static int tankCost = 20;
+    public static int level = 1; 
 }
