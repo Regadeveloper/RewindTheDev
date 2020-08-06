@@ -13,6 +13,7 @@ public class CameraSwitch : MonoBehaviour
     public Vector2 Pos4;
     public Vector2 Pos5;
     public Vector2 Pos6;
+    public Vector3 pos;
     public Camera mainCamera;
     int oldlevel;
     int newlevel;
@@ -24,22 +25,31 @@ public class CameraSwitch : MonoBehaviour
     {
         oldlevel = Globals.level;
         newlevel = oldlevel;
+        pos = transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
+
+
+        if (Input.GetKeyDown("l")){
+            Globals.level++;
+            newlevel++;
+        }
+
         if (newlevel > oldlevel)
         {
             switch (Globals.level)
             {
                 case 2:
+
+                    pos = Pos1;
                     oldlevel = newlevel;
-                    cameraMovement(Pos1);
                     break;
                 case 3:
+                    pos = Pos2;
                     oldlevel = newlevel;
-                    cameraMovement(Pos2);
                     break;
                 case 4:
                     break;
@@ -54,20 +64,18 @@ public class CameraSwitch : MonoBehaviour
 
 
             }
+
         }
 
-        if (Input.GetKeyDown("l")){
-            Globals.level++;
-            newlevel++;
-        }
 
-        void cameraMovement(Vector2 Pos)
-        {
-            Vector2 pos = Pos;
-            float velocity = -2;
-            int time = 3;
-            transform.position = pos;
-        }
+
+    }
+
+
+    public void LateUpdate()
+    {
         
+        float velocity = 0.004f;
+        transform.position = Vector3.Lerp(transform.position, pos, velocity);
     }
 }
