@@ -85,7 +85,7 @@ public class CameraSwitch : MonoBehaviour
     public void LateUpdate()
     {
         
-        float velocity = 0.004f;
+        float velocity = 0.006f;
         transform.position = Vector3.Lerp(transform.position, pos, velocity);
     }
 }
