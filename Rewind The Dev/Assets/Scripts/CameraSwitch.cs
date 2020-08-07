@@ -43,7 +43,6 @@ public class CameraSwitch : MonoBehaviour
             switch (Globals.level)
             {
                 case 2:
-
                     pos = Pos1;
                     oldlevel = newlevel;
                     break;
