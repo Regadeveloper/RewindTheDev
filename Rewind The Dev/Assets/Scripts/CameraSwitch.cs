@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CameraSwitch : MonoBehaviour
 {
-
+    [SerializeField] Vector2 PosInicial;
     [SerializeField] Vector2 Pos1;
     [SerializeField] Vector2 Pos2;
     [SerializeField] Vector2 Pos3;
@@ -52,14 +52,25 @@ public class CameraSwitch : MonoBehaviour
                     oldlevel = newlevel;
                     break;
                 case 4:
+                    pos = Pos3;
+                    oldlevel = newlevel;
                     break;
                 case 5:
+                    pos = Pos4;
+                    oldlevel = newlevel;
                     break;
                 case 6:
+                    pos = Pos5;
+                    oldlevel = newlevel;
                     break;
                 case 7:
+                    pos = Pos6;
+                    oldlevel = newlevel;
                     break;
                 default:
+                    pos = PosInicial;
+                    oldlevel = 0;
+                    newlevel = 0; 
                     break;
 
 
