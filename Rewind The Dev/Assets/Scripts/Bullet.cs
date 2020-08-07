@@ -8,7 +8,7 @@ public class Bullet : MonoBehaviour
 {
     Vector3 direction;
     float speed = 1f;
-    float dmg;
+    int dmg;
 
     void Start()
     {
@@ -20,13 +20,15 @@ public class Bullet : MonoBehaviour
 
     }
 
-    public void SetBullet(Vector3 obj,float d)
+    public void SetBullet(Vector3 obj,int d,bool visible)
     {
         dmg = d;
         direction = obj - transform.position;
+        if (visible) GetComponent<SpriteRenderer>().enabled = true;
+        else GetComponent<SpriteRenderer>().enabled = false;
     }
 
-    public float GetDamage() { return dmg; } 
+    public int GetDamage() { return dmg; } 
 
     void Update()
     {

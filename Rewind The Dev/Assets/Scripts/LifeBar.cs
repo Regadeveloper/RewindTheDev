@@ -16,7 +16,7 @@ public class LifeBar : MonoBehaviour
         startingScale = fillRect.transform.localScale.x;
     }
 
-    public void ChangeValue(float value)
+    public void ChangeValue(int value)
     {
         if (currentLife < life) currentLife += value;
         if (currentLife > life) currentLife = life;

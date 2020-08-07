@@ -16,31 +16,30 @@ public class UnitBehaviour : MonoBehaviour
     public bool playerUnit;
     [SerializeField] float moveSpeed;
     [SerializeField] int damage;
-    [SerializeField] float life;
+    [SerializeField] int life;
     [SerializeField] float attackRange;
     [SerializeField] float attackCD;
     public UnitType type;
 
     Vector3 atkPos;
     UnitState currentState;
-    [SerializeField]float attackCount;
+    float attackCount;
+    Animator anim;
+    bool ground = false;
 
     void Start()
     {
         currentState = UnitState.MOVE_FORWARD;
-        //if (playerUnit) GetComponent<SpriteRenderer>().flipY = true;
-    }
-
-    public void OnEnable()
-    {
-        currentState = UnitState.MOVE_FORWARD;
+        anim = GetComponent<Animator>();
         attackCount = 0;
+        life += Globals.extraDefense;
+        damage += Globals.extraDamage;
         if (playerUnit)
         {
-            transform.Rotate(0,180,0);
+            transform.Rotate(0, 180, 0);
             gameObject.layer = 9;
         }
-        else 
+        else
         {
             gameObject.layer = 8;
         }
@@ -53,33 +52,27 @@ public class UnitBehaviour : MonoBehaviour
             if (playerUnit)
             {
                 if (life <= 0) currentState = UnitState.DIE;
-
+                Vector3 airPos = transform.position;
+                RaycastHit2D hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));
+                RaycastHit2D hitAir;
+                Debug.Log(currentState.ToString());
                 if (currentState != UnitState.DIE)
                 {
-                    RaycastHit2D hitGround;
-                    RaycastHit2D hitAir;
-                    Vector3 airPos = transform.position;
                     if (attackCount < attackCD) attackCount += Time.deltaTime;
 
                     switch (type)
                     {
                         case UnitType.SOLDIER:
                         case UnitType.TANK:
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitGround.point;
-                                //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                            }
+                            else currentState = UnitState.MOVE_FORWARD;
+                                
                             break;
                         case UnitType.PLANE:
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));
                             airPos.x += 1;
                             airPos.y -= 3.5f;
                             hitAir = Physics2D.Raycast(airPos, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));
@@ -91,65 +84,51 @@ public class UnitBehaviour : MonoBehaviour
                                 {
                                     if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
                                     else atkPos = hitGround.point;
-
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                                 }
-                                else
-                                {
-                                    atkPos = hitGround.point;
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                }
+                                else atkPos = hitGround.point;
+                                    
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitAir.point;
-                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
-                            }
+                            else currentState = UnitState.MOVE_FORWARD;
+                               
                             break;
                         case UnitType.ARCHER:
-
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));                            
                             airPos.x += 1;
                             airPos.y = 0;
                             hitAir = Physics2D.Raycast(airPos, transform.right, attackRange, 1 << LayerMask.NameToLayer("Enemy"));
-
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
-                                    else atkPos = hitGround.point;
-
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    //Debug.DrawRay(airPos, -transform.right * hitAir.distance, Color.red);
+                                    if (hitAir.distance < hitGround.distance)
+                                    {
+                                        atkPos = hitAir.point;
+                                        ground = false;
+                                    }
+                                    else
+                                    {
+                                        atkPos = hitGround.point;
+                                        ground = true;
+                                    }
                                 }
-                                else 
+                                else
                                 {
                                     atkPos = hitGround.point;
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                }                                                                                                                            
+                                    ground = true;
+                                }                                                                                                                                                            
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitAir.point;
-                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                ground = false;
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
-                            }                          
+                            else  currentState = UnitState.MOVE_FORWARD;                                                  
                             break;
                     }                                  
                 }
@@ -160,16 +139,52 @@ public class UnitBehaviour : MonoBehaviour
                         Vector3 move = Vector3.zero;
                         move.x = -moveSpeed * Time.deltaTime;
                         transform.position += move;
+                        switch (type)
+                        {
+                            case UnitType.TANK:
+                                anim.Play("TankPlayerWalk");
+                                break;
+                            case UnitType.SOLDIER:
+                                anim.Play("WarriorPlayerWalk");
+                                break;
+                            case UnitType.PLANE:
+                                anim.Play("Fly2Player");
+                                break;
+                            case UnitType.ARCHER:
+                                anim.SetBool("Walk",true);
+                                break;
+                        }
                         break;
                     case UnitState.ATTACK:
                         if (attackCount >= attackCD)
                         {
-                            GameObject bullet = ObjectPooling.instance.SpawnFromPool("Bullets", transform.position, Quaternion.identity);
-                            if (bullet != null)
+                            GameObject bullet = null;
+                            switch (type)
                             {
-                                bullet.GetComponent<Bullet>().SetBullet(atkPos, damage);
-                                bullet.tag = "PlayerBullet";
+                                case UnitType.TANK:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("FlyBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage, false);
+                                    anim.Play("TankPlayerAttack");
+                                    break;
+                                case UnitType.SOLDIER:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("FlyBullet", transform.position, Quaternion.identity);                                    
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage, false);
+                                    anim.Play("WarriorPlayerAttack");
+                                    break;
+                                case UnitType.PLANE:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("FlyBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage,true);
+                                    anim.Play("Fly2PlayerAttack");
+                                    break;
+                                case UnitType.ARCHER:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("ArcherBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage,true);
+                                    if (ground) anim.SetTrigger("AttackGround");
+                                    else anim.SetTrigger("AttackAir");
+                                    break;
                             }
+                                
+                            bullet.tag = "PlayerBullet";                        
                             attackCount = 0;
                         }
                         break;
@@ -181,33 +196,28 @@ public class UnitBehaviour : MonoBehaviour
             else 
             {
                 if (life <= 0) currentState = UnitState.DIE;
+                Vector3 airPos = transform.position;
+                RaycastHit2D hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));
+                RaycastHit2D hitAir;
+               
 
                 if (currentState != UnitState.DIE)
-                {
-                    RaycastHit2D hitGround;
-                    RaycastHit2D hitAir;
-                    Vector3 airPos = transform.position;
+                {                 
                     if (attackCount < attackCD) attackCount += Time.deltaTime;
 
                     switch (type)
                     {
                         case UnitType.SOLDIER:
                         case UnitType.TANK:
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitGround.point;
-                                //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                            }
+                            else currentState = UnitState.MOVE_FORWARD;
+                               
                             break;
-                        case UnitType.PLANE:
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));
+                        case UnitType.PLANE:                        
                             airPos.x += 1;
                             airPos.y -= 3.5f;
                             hitAir = Physics2D.Raycast(airPos, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));
@@ -219,65 +229,52 @@ public class UnitBehaviour : MonoBehaviour
                                 {
                                     if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
                                     else atkPos = hitGround.point;
-
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                                 }
-                                else
-                                {
-                                    atkPos = hitGround.point;
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                }
+                                else atkPos = hitGround.point;
+                                    
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitAir.point;
-                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
-                            }
+                            else currentState = UnitState.MOVE_FORWARD;
+                                
                             break;
-                        case UnitType.ARCHER:
-
-                            hitGround = Physics2D.Raycast(transform.position, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));                         
+                        case UnitType.ARCHER:                      
                             airPos.x += 1;
                             airPos.y = 0;
                             hitAir = Physics2D.Raycast(airPos, transform.right, attackRange, 1 << LayerMask.NameToLayer("Player"));
-
                             if (hitGround.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 if (hitAir.collider)
                                 {
-                                    if (hitAir.distance < hitGround.distance) atkPos = hitAir.point;
-                                    else atkPos = hitGround.point;
-
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
-                                    //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                    if (hitAir.distance < hitGround.distance)
+                                    {
+                                        atkPos = hitAir.point;
+                                        ground = false;
+                                    }
+                                    else
+                                    {
+                                        atkPos = hitGround.point;
+                                        ground = true;
+                                    }
                                 }
                                 else
                                 {
                                     atkPos = hitGround.point;
-                                    //Debug.DrawRay(transform.position, transform.right * hitGround.distance, Color.red);
+                                    ground = true;
                                 }
                             }
                             else if (hitAir.collider)
                             {
                                 currentState = UnitState.ATTACK;
                                 atkPos = hitAir.point;
-                                //Debug.DrawRay(airPos, transform.right * hitAir.distance, Color.red);
+                                ground = false;
                             }
-                            else
-                            {
-                                currentState = UnitState.MOVE_FORWARD;
-                                //Debug.DrawRay(transform.position, transform.right * attackRange, Color.green);
-                                //Debug.DrawRay(airPos, transform.right * attackRange, Color.green);
-                            }
+                            else currentState = UnitState.MOVE_FORWARD;
+                               
                             break;
                     }
                 }
@@ -288,16 +285,39 @@ public class UnitBehaviour : MonoBehaviour
                         Vector3 move = Vector3.zero;
                         move.x = moveSpeed * Time.deltaTime;
                         transform.position += move;
+                        switch (type)
+                        {
+                            case UnitType.TANK:
+                                break;
+                            case UnitType.SOLDIER:
+                                break;
+                            case UnitType.PLANE:
+                                break;
+                            case UnitType.ARCHER:
+                                break;
+                        }
                         break;
                     case UnitState.ATTACK:
                         if (attackCount >= attackCD)
                         {
-                            GameObject bullet = ObjectPooling.instance.SpawnFromPool("Bullets", transform.position, Quaternion.identity);
-                            if (bullet != null)
+                            GameObject bullet = null;
+                            switch (type)
                             {
-                                bullet.GetComponent<Bullet>().SetBullet(atkPos, damage);
-                                bullet.tag = "EnemyBullet";
+                                case UnitType.TANK:
+                                case UnitType.SOLDIER:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("FlyBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage, false);
+                                    break;
+                                case UnitType.PLANE:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("FlyBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage, true);
+                                    break;
+                                case UnitType.ARCHER:
+                                    bullet = ObjectPooling.instance.SpawnFromPool("ArcherBullet", transform.position, Quaternion.identity);
+                                    bullet.GetComponent<Bullet>().SetBullet(atkPos, damage, true);
+                                    break;
                             }
+                            bullet.tag = "EnemyBullet";                           
                             attackCount = 0;
                         }
                         break;

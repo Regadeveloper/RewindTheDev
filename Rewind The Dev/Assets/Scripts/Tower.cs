@@ -4,15 +4,41 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] bool isplayer;
+    [SerializeField] int life;
+    [SerializeField] LifeBar bar;
+
     void Start()
     {
-        
+
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        
+        if (isplayer)
+        {
+            if (collision.gameObject.CompareTag("Enemy"))
+            {
+                life -= collision.gameObject.GetComponent<Bullet>().GetDamage();
+                bar.ChangeValue(collision.gameObject.GetComponent<Bullet>().GetDamage());
+                collision.gameObject.SetActive(false);
+                if (life <= 0) TowerDestroyed();
+            }
+        }
+        else
+        {
+            if (collision.gameObject.CompareTag("Player"))
+            {
+                life -= collision.gameObject.GetComponent<Bullet>().GetDamage();
+                bar.ChangeValue(collision.gameObject.GetComponent<Bullet>().GetDamage());
+                collision.gameObject.SetActive(false);
+                if (life <= 0) TowerDestroyed();
+            }
+        }
+    }
+
+    private void TowerDestroyed()
+    {
+
     }
 }

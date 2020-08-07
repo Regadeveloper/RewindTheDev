@@ -10,6 +10,10 @@ public class IASpawnControl : MonoBehaviour
     public int maxEnemiesTik = 3;
     [SerializeField] Transform airSpawn;
     [SerializeField] Transform groundSpawn;
+    [SerializeField] GameObject soldier;
+    [SerializeField] GameObject plane;
+    [SerializeField] GameObject archer;
+    [SerializeField] GameObject tank;
 
     float count;
     [SerializeField]float gold;
@@ -38,7 +42,7 @@ public class IASpawnControl : MonoBehaviour
                             if (gold >= Globals.soldierCost)
                             {
                                 gold -= Globals.soldierCost;
-                                unit = ObjectPooling.instance.SpawnFromPool("Soldier", groundSpawn.position, Quaternion.identity);
+                                unit = Instantiate(soldier, groundSpawn.position, Quaternion.identity);
                                 unit.GetComponent<UnitBehaviour>().playerUnit = false;
                             }
                             break;
@@ -46,7 +50,7 @@ public class IASpawnControl : MonoBehaviour
                             if (gold >= Globals.archerCost)
                             {
                                 gold -= Globals.archerCost;
-                                unit = ObjectPooling.instance.SpawnFromPool("Archer", groundSpawn.position, Quaternion.identity);
+                                unit = Instantiate(archer, groundSpawn.position, Quaternion.identity);
                                 unit.GetComponent<UnitBehaviour>().playerUnit = false;
                             }
                             break;
@@ -54,7 +58,7 @@ public class IASpawnControl : MonoBehaviour
                             if (gold >= Globals.planeCost)
                             {
                                 gold -= Globals.planeCost;
-                                unit = ObjectPooling.instance.SpawnFromPool("Plane", airSpawn.position, Quaternion.identity);
+                                unit = Instantiate(plane, groundSpawn.position, Quaternion.identity);
                                 unit.GetComponent<UnitBehaviour>().playerUnit = false;
                             }
                             break;
@@ -62,7 +66,7 @@ public class IASpawnControl : MonoBehaviour
                             if (gold >= Globals.tankCost)
                             {
                                 gold -= Globals.tankCost;
-                                unit = ObjectPooling.instance.SpawnFromPool("Tank", groundSpawn.position, Quaternion.identity);
+                                unit = Instantiate(tank, groundSpawn.position, Quaternion.identity);
                                 unit.GetComponent<UnitBehaviour>().playerUnit = false;
                             }
                             break;

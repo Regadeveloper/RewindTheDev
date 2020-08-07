@@ -28,6 +28,7 @@ public class ObjectPooling : MonoBehaviour
             for (int a = 0; a < pools[i].size; a++)
             {
                 GameObject aux = Instantiate(pools[i].prefab);
+                //aux.GetComponent<UnitBehaviour>().FakeStart();
                 aux.SetActive(false);
                 pool.Enqueue(aux);               
             }
